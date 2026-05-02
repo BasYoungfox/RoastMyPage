@@ -2,8 +2,8 @@
 
 AI-powered landing page critic. Paste a URL, get a brutal honest breakdown of your headline, copy, CTA, and conversion potential — scored out of 100.
 
-**Live:** [roastmypage.vercel.app](https://roastmypage.vercel.app)  
-**API Docs:** [roastmypage.vercel.app/docs](https://roastmypage.vercel.app/docs)
+**Live:** [roastthispage.vercel.app](roastthispage.vercel.app)  
+**API Docs:** [roastthispage.vercel.app/docs](https://roastthispage.vercel.app.app/docs)
 
 ---
 
