@@ -43,6 +43,9 @@ function scoreToLetterColor(score: number) {
   return 'text-red-600'
 }
 
+const STORAGE_ROASTED = 'rtp_roasted'
+const STORAGE_UNLOCKED = 'rtp_unlocked'
+
 export default function Home() {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
@@ -51,9 +54,29 @@ export default function Home() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
   const [subscribing, setSubscribing] = useState(false)
+  const [gated, setGated] = useState(false)
+
+  const isUnlocked = () => {
+    try { return localStorage.getItem(STORAGE_UNLOCKED) === '1' } catch { return false }
+  }
+  const hasRoasted = () => {
+    try { return localStorage.getItem(STORAGE_ROASTED) === '1' } catch { return false }
+  }
+  const markRoasted = () => {
+    try { localStorage.setItem(STORAGE_ROASTED, '1') } catch { /* noop */ }
+  }
+  const markUnlocked = () => {
+    try { localStorage.setItem(STORAGE_UNLOCKED, '1') } catch { /* noop */ }
+  }
 
   const handleRoast = async () => {
     if (!url.trim() || loading) return
+
+    if (hasRoasted() && !isUnlocked()) {
+      setGated(true)
+      return
+    }
+
     setLoading(true)
     setError('')
     setResult(null)
@@ -69,6 +92,7 @@ export default function Home() {
         throw new Error(data.error || 'Something went wrong')
       }
       const data = await res.json()
+      markRoasted()
       setResult({ ...data, url: url.trim() })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Try again.')
@@ -86,7 +110,11 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
-      if (res.ok) setSubscribed(true)
+      if (res.ok) {
+        markUnlocked()
+        setSubscribed(true)
+        setGated(false)
+      }
     } finally {
       setSubscribing(false)
     }
@@ -179,8 +207,35 @@ export default function Home() {
             </div>
           )}
 
+          {/* Gate */}
+          {gated && !loading && (
+            <div className="px-8 py-10 border-b border-stone-200 bg-stone-50 text-center">
+              <p className="text-[10px] font-bold tracking-widest uppercase text-stone-400 mb-2">Free roast used</p>
+              <p className="text-stone-700 font-semibold text-base mb-1">Want another roast?</p>
+              <p className="text-stone-400 text-sm mb-6">Drop your email to unlock unlimited roasts.</p>
+              <div className="flex gap-2 max-w-sm mx-auto">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
+                  placeholder="your@email.com"
+                  autoFocus
+                  className="flex-1 border-0 border-b-2 border-stone-400 bg-transparent text-stone-700 placeholder-stone-300 focus:outline-none focus:border-stone-700 py-1.5 text-sm transition-colors"
+                />
+                <button
+                  onClick={handleSubscribe}
+                  disabled={subscribing || !email.trim()}
+                  className="bg-stone-800 hover:bg-stone-700 disabled:opacity-40 disabled:cursor-not-allowed text-amber-50 text-xs font-bold tracking-widest uppercase px-4 py-2 transition-colors shrink-0"
+                >
+                  {subscribing ? '...' : 'Unlock →'}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Empty state */}
-          {!loading && !result && (
+          {!loading && !result && !gated && (
             <div className="px-8 py-16 text-center">
               <p className="text-stone-300 text-sm italic">Enter a URL above to receive your grade.</p>
             </div>
