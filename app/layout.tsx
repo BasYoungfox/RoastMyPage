@@ -6,10 +6,10 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "RoastMyPage — Brutal AI Landing Page Critique",
+  title: "RoastThisPage — Brutal AI Landing Page Critique",
   description: "Get a brutally honest, AI-powered critique of your landing page. No sugarcoating.",
   openGraph: {
-    title: "RoastMyPage — Brutal AI Landing Page Critique",
+    title: "RoastThisPage — Brutal AI Landing Page Critique",
     description: "Get a brutally honest, AI-powered critique of your landing page.",
     type: "website",
   },

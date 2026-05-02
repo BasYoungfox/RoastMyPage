@@ -1,9 +1,14 @@
-# 🔥 RoastMyPage
+# 🔥 RoastThisPage
 
 AI-powered landing page critic. Paste a URL, get a brutal honest breakdown of your headline, copy, CTA, and conversion potential — scored out of 100.
 
+<<<<<<< HEAD
 **Live:** [roastthispage.vercel.app](roastthispage.vercel.app)  
 **API Docs:** [roastthispage.vercel.app/docs](https://roastthispage.vercel.app.app/docs)
+=======
+**Live:** [RoastThisPage.vercel.app](https://RoastThisPage.vercel.app)  
+**API Docs:** [RoastThisPage.vercel.app/docs](https://RoastThisPage.vercel.app/docs)
+>>>>>>> 0d81382 (Rebrand to RoastThisPage)
 
 ---
 
@@ -64,8 +69,8 @@ example.py                 # Python script demonstrating API usage
 ### Steps
 
 ```bash
-git clone https://github.com/BasYoungfox/RoastMyPage.git
-cd RoastMyPage
+git clone https://github.com/BasYoungfox/RoastThisPage.git
+cd RoastThisPage
 npm install
 ```
 
@@ -92,7 +97,7 @@ Free, open, no key required.
 ### Request
 
 ```http
-POST https://roastmypage.vercel.app/api/v1/roast
+POST https://RoastThisPage.vercel.app/api/v1/roast
 Content-Type: application/json
 
 { "url": "https://yoursite.com" }

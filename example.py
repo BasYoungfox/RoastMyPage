@@ -1,6 +1,6 @@
 import requests
 
-API_URL = "https://roastmypage.vercel.app/api/v1/roast"
+API_URL = "https://RoastThisPage.vercel.app/api/v1/roast"
 
 url = input("Enter a URL to roast: ").strip()
 
