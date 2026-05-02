@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { Resend } from 'resend'
 import { fetchPageContent, generateRoast, RoastResult } from '@/lib/roast'
+import { transporter } from '@/lib/mailer'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -168,8 +169,8 @@ export async function POST(request: NextRequest) {
     let sent = 0
     for (const batch of batches) {
       await Promise.all(batch.map((to) =>
-        resend.emails.send({
-          from: 'onboarding@resend.dev',
+        transporter.sendMail({
+          from: `RoastThisPage <${process.env.GMAIL_USER}>`,
           to,
           subject: `Issue #${issueNumber} — ${url} got roasted (${roast.overallScore}/100)`,
           html,
