@@ -111,7 +111,12 @@ function buildEmailHtml(url: string, roast: RoastResult, issueNumber: number): s
 }
 
 export async function POST(request: NextRequest) {
-  const { url, password, issueNumber = 1, preview = false } = await request.json()
+  let url: string, password: string, issueNumber: number, preview: boolean
+  try {
+    ;({ url, password, issueNumber = 1, preview = false } = await request.json())
+  } catch {
+    return Response.json({ error: 'Invalid request body' }, { status: 400 })
+  }
 
   if (password !== process.env.ADMIN_PASSWORD) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -127,39 +132,54 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Couldn't fetch that page." }, { status: 400 })
   }
 
-  const roast = await generateRoast(pageContent)
+  let roast
+  try {
+    roast = await generateRoast(pageContent)
+  } catch {
+    return Response.json({ error: 'AI failed to generate the roast. Try again.' }, { status: 500 })
+  }
+
   const html = buildEmailHtml(url, roast, issueNumber)
 
-  // Preview mode — just return the roast + html without sending
+  // Preview mode — just return the roast without sending
   if (preview) {
     return Response.json({ roast, html })
   }
 
   // Get audience and contacts
-  const audienceId = await getAudienceId()
-  if (!audienceId) return Response.json({ error: 'No audience found. Subscribe someone first.' }, { status: 400 })
-
-  const contacts = await getAllContacts(audienceId)
-  if (contacts.length === 0) return Response.json({ error: 'No subscribers yet.' }, { status: 400 })
+  let audienceId: string | null
+  let contacts: string[]
+  try {
+    audienceId = await getAudienceId()
+    if (!audienceId) return Response.json({ error: 'No audience found. Subscribe someone first.' }, { status: 400 })
+    contacts = await getAllContacts(audienceId)
+    if (contacts.length === 0) return Response.json({ error: 'No subscribers yet.' }, { status: 400 })
+  } catch {
+    return Response.json({ error: 'Failed to fetch subscribers from Resend.' }, { status: 500 })
+  }
 
   // Send in batches of 50 (Resend limit)
-  const batches = []
-  for (let i = 0; i < contacts.length; i += 50) {
-    batches.push(contacts.slice(i, i + 50))
-  }
+  try {
+    const batches = []
+    for (let i = 0; i < contacts.length; i += 50) {
+      batches.push(contacts.slice(i, i + 50))
+    }
 
-  let sent = 0
-  for (const batch of batches) {
-    await Promise.all(batch.map((to) =>
-      resend.emails.send({
-        from: 'onboarding@resend.dev',
-        to,
-        subject: `Issue #${issueNumber} — ${url} got roasted (${roast.overallScore}/100)`,
-        html,
-      })
-    ))
-    sent += batch.length
-  }
+    let sent = 0
+    for (const batch of batches) {
+      await Promise.all(batch.map((to) =>
+        resend.emails.send({
+          from: 'onboarding@resend.dev',
+          to,
+          subject: `Issue #${issueNumber} — ${url} got roasted (${roast.overallScore}/100)`,
+          html,
+        })
+      ))
+      sent += batch.length
+    }
 
-  return Response.json({ success: true, sent, roast })
+    return Response.json({ success: true, sent, roast })
+  } catch {
+    return Response.json({ error: 'Failed to send emails.' }, { status: 500 })
+  }
 }
