@@ -261,15 +261,15 @@ export default function Home() {
               <div className="border-b-2 border-stone-300 px-8 py-6 bg-stone-50">
                 {subscribed ? (
                   <p className="text-sm text-stone-500 italic text-center">
-                    ✓ You're on the list. Weekly teardowns incoming.
+                    ✓ You're on the list. We'll be in touch.
                   </p>
                 ) : (
                   <>
                     <p className="text-[10px] font-bold tracking-widest uppercase text-stone-400 mb-1">
-                      Weekly Landing Page Teardowns
+                      Stay in the loop
                     </p>
                     <p className="text-sm text-stone-500 mb-4">
-                      Get one real landing page torn apart every week — what's broken, what works, and how to fix it.
+                      Drop your email and get notified when we post new teardowns and updates.
                     </p>
                     <div className="flex gap-2">
                       <input

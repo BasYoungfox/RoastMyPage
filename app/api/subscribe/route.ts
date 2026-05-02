@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server'
 import { Resend } from 'resend'
-import { transporter } from '@/lib/mailer'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -22,17 +21,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const audienceId = await getOrCreateAudienceId()
-
     await resend.contacts.create({ email, audienceId, unsubscribed: false })
-
-    // Notify you via Gmail
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
-      to: process.env.GMAIL_USER,
-      subject: `New subscriber: ${email}`,
-      text: `${email} just subscribed on RoastThisPage.`,
-    })
-
     return Response.json({ success: true })
   } catch (err) {
     console.error('[subscribe]', err)
